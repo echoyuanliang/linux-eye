@@ -3,7 +3,6 @@ package toolkits
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -35,10 +34,10 @@ type ProcStat struct {
 }
 
 func CurrentProcStat() (*ProcStat, error) {
-	f := "/proc/stat"
-	bs, err := ioutil.ReadFile(f)
+	statFile := "/proc/stat"
+	bs, err := ioutil.ReadFile(statFile)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read from %s failed: %v", statFile, err)
 	}
 
 	ps := &ProcStat{CpuList: make([]*CpuUsage, runtime.NumCPU())}
@@ -51,9 +50,7 @@ func CurrentProcStat() (*ProcStat, error) {
 			err = nil
 			break
 		} else if err != nil {
-			errMsg := fmt.Sprintf("read /proc/stat buffer failed: %v", err)
-			log.Error(errMsg)
-			return ps, errors.New(errMsg)
+			return ps,  fmt.Errorf("read %s buffer failed: %v", statFile, err)
 		}
 		parseLine(line, ps)
 	}

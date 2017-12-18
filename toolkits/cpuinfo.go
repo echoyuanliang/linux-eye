@@ -3,7 +3,6 @@ package toolkits
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,12 +18,10 @@ type CpuInfo struct {
 }
 
 func GetCpuInfo() (*CpuInfo, error) {
-
-	bs, err := ioutil.ReadFile("/proc/cpuinfo")
+	cpuinfoFile := "/proc/cpuinfo"
+	bs, err := ioutil.ReadFile(cpuinfoFile)
 	if err != nil {
-		errMsg := fmt.Sprintf("read /proc/cpuinfo failed: %v", err)
-		log.Error(errMsg)
-		return nil, errors.New(errMsg)
+		return nil, fmt.Errorf("read %s failed: %v", cpuinfoFile, err)
 	}
 
 	reader := bufio.NewReader(bytes.NewBuffer(bs))
@@ -36,9 +33,7 @@ func GetCpuInfo() (*CpuInfo, error) {
 			err = nil
 			break
 		} else if err != nil {
-			errMsg := fmt.Sprintf("read /proc/cpuinfo buffer failed: %v", err)
-			log.Error(errMsg)
-			return cpuInfo, errors.New(errMsg)
+			return cpuInfo, fmt.Errorf("read %s buffer failed: %v", cpuinfoFile, err)
 		}
 
 		arr := strings.Split(line, ":")
@@ -51,9 +46,7 @@ func GetCpuInfo() (*CpuInfo, error) {
 
 			mHz, err := strconv.ParseFloat(strings.TrimSpace(arr[1]), 32)
 			if err != nil {
-				errMsg := fmt.Sprintf("unsupport /proc/cpuinfo format: %v", err)
-				log.Error(errMsg)
-				return cpuInfo, errors.New(errMsg)
+				return cpuInfo, fmt.Errorf("unsupport %s format: %v", cpuinfoFile, err)
 			}
 
 			cpuInfo.MHz = float32(mHz)

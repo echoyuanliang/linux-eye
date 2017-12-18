@@ -3,7 +3,6 @@ package toolkits
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -73,11 +72,10 @@ func ignorePoint(point string) bool {
 }
 
 func ListMountPoint() ([]*Mount, error) {
-	contents, err := ioutil.ReadFile("/proc/mounts")
+	mountsFile := "/proc/mounts"
+	contents, err := ioutil.ReadFile(mountsFile)
 	if err != nil {
-		errMsg := fmt.Sprintf("read /proc/mounts failed, error: %v", err)
-		log.Error(errMsg)
-		return nil, errors.New(errMsg)
+		return nil, fmt.Errorf("read %s failed, error: %v", mountsFile, err)
 	}
 
 	mounts := make([]*Mount, 0)
@@ -89,9 +87,7 @@ func ListMountPoint() ([]*Mount, error) {
 			err = nil
 			break
 		} else if err != nil {
-			errMsg := fmt.Sprintf("read /proc/mounts buffer failed, error: %v", err)
-			log.Error(errMsg)
-			return nil, errors.New(errMsg)
+			return nil, fmt.Errorf("read %s buffer failed, error: %v", mountsFile, err)
 		}
 
 		fields := strings.Fields(string(line))
@@ -144,9 +140,7 @@ func BuildDeviceUsage(mount *Mount) (*DeviceUsage, error) {
 	fs := syscall.Statfs_t{}
 	err := syscall.Statfs(mount.Point, &fs)
 	if err != nil {
-		errMsg := fmt.Sprintf("call Statfs failed: %v", err)
-		log.Error(errMsg)
-		return nil, errors.New(errMsg)
+		return nil, fmt.Errorf("call Statfs failed: %v", err)
 	}
 
 	//blocks
@@ -199,17 +193,14 @@ func BuildDeviceUsage(mount *Mount) (*DeviceUsage, error) {
 func ListDeviceUsage() ([]*DeviceUsage, error) {
 	mounts, err := ListMountPoint()
 	if err != nil {
-		errMsg := fmt.Sprintf("list mount point failed: %v", err)
-		log.Error(errMsg)
-		return nil, errors.New(errMsg)
+		return nil, fmt.Errorf("list mount point failed: %v", err)
 	}
 
 	usages := make([]*DeviceUsage, len(mounts))
 	for idx, mount := range mounts {
 		usage, err := BuildDeviceUsage(mount)
 		if err != nil {
-			log.Errorf("build device usage of %s failed: %v", mount.Device, err)
-			continue
+			return nil, fmt.Errorf("build device usage of %s failed: %v", mount.Device, err)
 		}
 
 		usages[idx] = usage
