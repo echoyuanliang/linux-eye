@@ -17,7 +17,7 @@ func main()  {
 	wg.Add(len(infoProcesses))
 
 	for _, name := range infoProcesses{
-		go func() {
+		go func(name string) {
 
 			var info interface{}
 			err := fmt.Errorf("%s not defined", name)
@@ -46,7 +46,7 @@ func main()  {
 			}
 
 			wg.Done()
-		}()
+		}(name)
 
 	}
 
