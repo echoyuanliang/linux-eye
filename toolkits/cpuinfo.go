@@ -8,7 +8,10 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"errors"
+	"fmt"
 )
+
 
 type CpuInfo struct {
 	Num       int     `json:"num"`
@@ -17,11 +20,12 @@ type CpuInfo struct {
 }
 
 func GetCpuInfo() (*CpuInfo, error) {
-	f := "/proc/cpuinfo"
 
-	bs, err := ioutil.ReadFile(f)
+	bs, err := ioutil.ReadFile("/proc/cpuinfo")
 	if err != nil {
-		return nil, err
+		errMsg := fmt.Sprintf("read /proc/cpuinfo failed: %v", err)
+		log.Error(errMsg)
+		return nil, errors.New(errMsg)
 	}
 
 	reader := bufio.NewReader(bytes.NewBuffer(bs))
@@ -30,7 +34,14 @@ func GetCpuInfo() (*CpuInfo, error) {
 	for {
 		line, err := reader.ReadString('\n')
 		if err == io.EOF {
-			return cpuInfo, err
+			err = nil
+			break
+		}
+
+		if err != nil{
+			errMsg := fmt.Sprintf("read /proc/cpuinfo buffer failed: %v", err)
+			log.Error(errMsg)
+			return cpuInfo, errors.New(errMsg)
 		}
 
 		arr := strings.Split(line, ":")
@@ -43,7 +54,9 @@ func GetCpuInfo() (*CpuInfo, error) {
 
 			mHz, err := strconv.ParseFloat(arr[1], 32)
 			if err != nil {
-				return cpuInfo, err
+				errMsg := fmt.Sprintf("unsupport /proc/cpuinfo format: %v", err)
+				log.Error(errMsg)
+				return cpuInfo, errors.New(errMsg)
 			}
 
 			cpuInfo.MHz = float32(mHz)

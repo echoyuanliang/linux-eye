@@ -8,16 +8,27 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"strconv"
+	"io/ioutil"
 )
 
 var log = logging.MustGetLogger("linux-eye")
+
+type UpTime struct{
+	Days uint64
+	Hours uint8
+	Minutes uint8
+}
 
 type SystemInfo struct {
 	HostName string `json:"host_name"`
 	Platform string `json:"platform"`
 	Os       string `json:"os"`
 	Kernel   string `json:"kernel"`
+	UpTime 	 *UpTime `json:"up_time"`
+
 }
+
 
 func getInfo() (string, error) {
 	cmd := exec.Command("uname", "-srio")
@@ -29,19 +40,55 @@ func getInfo() (string, error) {
 	err := cmd.Run()
 	if err != nil {
 		errMsg := fmt.Sprintf("exec %s failed: %v", "uname -srio", err)
-		log.Errorf(errMsg)
+		log.Error(errMsg)
 		return "", errors.New(errMsg)
 	}
 
 	return out.String(), nil
 }
 
+func SystemUptime() (*UpTime, error) {
+	bs, err := ioutil.ReadFile("/proc/uptime")
+	if err != nil{
+		errMsg := fmt.Sprintf("read /proc/uptime failed: %v", err)
+		log.Error(errMsg)
+		return nil, errors.New(errMsg)
+	}
+
+	content := strings.TrimSpace(string(bs))
+	fields := strings.Fields(content)
+	if len(fields) < 2 {
+		errMsg := "/proc/uptime format not supported"
+		log.Error(errMsg)
+		return nil, errors.New(errMsg)
+	}
+
+	secStr := fields[0]
+	var secF float64
+	secF, err = strconv.ParseFloat(secStr, 64)
+	if err != nil {
+		errMsg := "/proc/uptime format not supported"
+		log.Error(errMsg)
+		return nil, errors.New(errMsg)
+	}
+
+	minTotal := secF / 60.0
+	hourTotal := minTotal / 60.0
+
+	days := int64(hourTotal / 24.0)
+	hours := int64(hourTotal) - days*24
+	minutes := int64(minTotal) - (days * 60 * 24) - (hours * 60)
+
+	return &UpTime{Days:uint64(days), Hours:uint8(hours),Minutes:uint8(minutes)}, nil
+}
+
+
 func GetSystemInfo() (*SystemInfo, error) {
 
 	out, err := getInfo()
 	if err != nil || strings.Index(out, "broken pipe") != -1 {
 		errMsg := fmt.Sprintf("get system info failed, error: %v, out: %s", err, out)
-		log.Errorf(errMsg)
+		log.Error(errMsg)
 		return nil, errors.New(errMsg)
 	}
 
@@ -53,11 +100,19 @@ func GetSystemInfo() (*SystemInfo, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		errMsg := fmt.Sprintf("get hostname failed: %v", err)
-		log.Errorf(errMsg)
+		log.Error(errMsg)
 		return systemInfo, errors.New(errMsg)
 	}
 
 	systemInfo.HostName = hostname
-	return systemInfo, nil
 
+	uptime, err := SystemUptime()
+	if err != nil{
+		errMsg := fmt.Sprintf("get system uptime failed, error: %v", err)
+		log.Error(errMsg)
+		return systemInfo, errors.New(errMsg)
+	}
+
+	systemInfo.UpTime = uptime
+	return systemInfo, nil
 }
