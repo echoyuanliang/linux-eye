@@ -1,13 +1,12 @@
 package toolkits
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
+	"linux-eye/util"
 )
 
 
@@ -26,18 +25,7 @@ type SystemInfo struct {
 }
 
 func getInfo() (string, error) {
-	cmd := exec.Command("uname", "-srio")
-	cmd.Stdin = strings.NewReader("some input")
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if err != nil {
-		return "", fmt.Errorf("exec %s failed: %v", "uname -srio", err)
-	}
-
-	return out.String(), nil
+	return util.Exec("uname", "-srio")
 }
 
 func SystemUptime() (*UpTime, error) {

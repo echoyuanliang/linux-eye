@@ -60,3 +60,7 @@ func GetCpuInfo() (*CpuInfo, error) {
 	return cpuInfo, nil
 
 }
+
+func Get()  {
+	
+}
