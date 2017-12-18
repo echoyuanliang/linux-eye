@@ -176,6 +176,7 @@ func BuildDeviceUsage(mount *Mount) (*DeviceUsage, error) {
 		usage.InodesFree = fs.Ffree
 		usage.InodesUsed = fs.Files - fs.Ffree
 	}
+
 	if fs.Files == 0 {
 		usage.InodesUsedPercent = 0
 		usage.InodesFreePercent = 0

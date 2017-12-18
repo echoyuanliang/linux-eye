@@ -36,9 +36,7 @@ func GetCpuInfo() (*CpuInfo, error) {
 		if err == io.EOF {
 			err = nil
 			break
-		}
-
-		if err != nil{
+		}else if err != nil{
 			errMsg := fmt.Sprintf("read /proc/cpuinfo buffer failed: %v", err)
 			log.Error(errMsg)
 			return cpuInfo, errors.New(errMsg)

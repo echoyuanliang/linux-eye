@@ -31,4 +31,10 @@ func main()  {
 	}
 	fmt.Print(json.Marshal(fsInfo))
 
+	procStat, err := toolkits.CurrentProcStat()
+	if err != nil{
+		log.Errorf("get proc stat failed: %v", err)
+	}
+	fmt.Print(json.Marshal(procStat))
+
 }
