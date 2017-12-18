@@ -5,30 +5,28 @@ import (
 	"errors"
 	"fmt"
 	"github.com/op/go-logging"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"strconv"
-	"io/ioutil"
+	"strings"
 )
 
 var log = logging.MustGetLogger("linux-eye")
 
-type UpTime struct{
-	Days uint64
-	Hours uint8
+type UpTime struct {
+	Days    uint64
+	Hours   uint8
 	Minutes uint8
 }
 
 type SystemInfo struct {
-	HostName string `json:"host_name"`
-	Platform string `json:"platform"`
-	Os       string `json:"os"`
-	Kernel   string `json:"kernel"`
-	UpTime 	 *UpTime `json:"up_time"`
-
+	HostName string  `json:"host_name"`
+	Platform string  `json:"platform"`
+	Os       string  `json:"os"`
+	Kernel   string  `json:"kernel"`
+	UpTime   *UpTime `json:"up_time"`
 }
-
 
 func getInfo() (string, error) {
 	cmd := exec.Command("uname", "-srio")
@@ -49,7 +47,7 @@ func getInfo() (string, error) {
 
 func SystemUptime() (*UpTime, error) {
 	bs, err := ioutil.ReadFile("/proc/uptime")
-	if err != nil{
+	if err != nil {
 		errMsg := fmt.Sprintf("read /proc/uptime failed: %v", err)
 		log.Error(errMsg)
 		return nil, errors.New(errMsg)
@@ -79,9 +77,8 @@ func SystemUptime() (*UpTime, error) {
 	hours := int64(hourTotal) - days*24
 	minutes := int64(minTotal) - (days * 60 * 24) - (hours * 60)
 
-	return &UpTime{Days:uint64(days), Hours:uint8(hours),Minutes:uint8(minutes)}, nil
+	return &UpTime{Days: uint64(days), Hours: uint8(hours), Minutes: uint8(minutes)}, nil
 }
-
 
 func GetSystemInfo() (*SystemInfo, error) {
 
@@ -107,7 +104,7 @@ func GetSystemInfo() (*SystemInfo, error) {
 	systemInfo.HostName = hostname
 
 	uptime, err := SystemUptime()
-	if err != nil{
+	if err != nil {
 		errMsg := fmt.Sprintf("get system uptime failed, error: %v", err)
 		log.Error(errMsg)
 		return systemInfo, errors.New(errMsg)

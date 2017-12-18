@@ -3,15 +3,14 @@ package toolkits
 import (
 	"bufio"
 	"bytes"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"runtime"
 	"strconv"
 	"strings"
-	"errors"
-	"fmt"
 )
-
 
 type CpuInfo struct {
 	Num       int     `json:"num"`
@@ -36,7 +35,7 @@ func GetCpuInfo() (*CpuInfo, error) {
 		if err == io.EOF {
 			err = nil
 			break
-		}else if err != nil{
+		} else if err != nil {
 			errMsg := fmt.Sprintf("read /proc/cpuinfo buffer failed: %v", err)
 			log.Error(errMsg)
 			return cpuInfo, errors.New(errMsg)

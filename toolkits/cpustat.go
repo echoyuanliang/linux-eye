@@ -1,41 +1,38 @@
 package toolkits
 
 import (
-	"strconv"
-	"io/ioutil"
 	"bufio"
-	"io"
-	"runtime"
 	"bytes"
-	"strings"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"runtime"
+	"strconv"
+	"strings"
 )
 
-
 type CpuUsage struct {
-	User    uint64	`json:"user"`
-	Nice    uint64	`json:"nice"`
-	System  uint64	`json:"system"`
-	Idle    uint64	`json:"idle"`
-	IoWait  uint64	`json:"io_wait"`
-	Irq     uint64	`json:"irq"`
-	SoftIrq uint64	`json:"soft_irq"`
-	Steal   uint64	`json:"steal"`
-	Guest   uint64	`json:"guest"`
-	Total   uint64	`json:"total"`
+	User    uint64 `json:"user"`
+	Nice    uint64 `json:"nice"`
+	System  uint64 `json:"system"`
+	Idle    uint64 `json:"idle"`
+	IoWait  uint64 `json:"io_wait"`
+	Irq     uint64 `json:"irq"`
+	SoftIrq uint64 `json:"soft_irq"`
+	Steal   uint64 `json:"steal"`
+	Guest   uint64 `json:"guest"`
+	Total   uint64 `json:"total"`
 }
-
 
 type ProcStat struct {
-	Cpu          *CpuUsage	`json:"cpu"`
-	CpuList         []*CpuUsage	`json:"cpu_list"`
-	Ctxt         uint64	`json:"ctxt"`
-	Processes    uint64	`json:"processes"`
-	ProcessRunning uint64	`json:"process_running"`
-	ProcessBlocked uint64		`json:"process_blocked"`
+	Cpu            *CpuUsage   `json:"cpu"`
+	CpuList        []*CpuUsage `json:"cpu_list"`
+	Ctxt           uint64      `json:"ctxt"`
+	Processes      uint64      `json:"processes"`
+	ProcessRunning uint64      `json:"process_running"`
+	ProcessBlocked uint64      `json:"process_blocked"`
 }
-
 
 func CurrentProcStat() (*ProcStat, error) {
 	f := "/proc/stat"
@@ -140,4 +137,3 @@ func parseCpuFields(fields []string) *CpuUsage {
 	}
 	return cu
 }
-
