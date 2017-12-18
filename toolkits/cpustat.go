@@ -74,7 +74,7 @@ func parseLine(line string, ps *ProcStat) {
 	}
 
 	if strings.HasPrefix(fieldName, "cpu") {
-		idx, err := strconv.Atoi(fieldName[3:])
+		idx, err := strconv.Atoi(strings.TrimSpace(fieldName[3:]))
 		if err != nil || idx >= len(ps.CpuList) {
 			return
 		}
@@ -83,23 +83,25 @@ func parseLine(line string, ps *ProcStat) {
 		return
 	}
 
+	filedValue := strings.TrimSpace(fields[1])
+
 	if fieldName == "ctxt" {
-		ps.Ctxt, _ = strconv.ParseUint(fields[1], 10, 64)
+		ps.Ctxt, _ = strconv.ParseUint(filedValue, 10, 64)
 		return
 	}
 
 	if fieldName == "processes" {
-		ps.Processes, _ = strconv.ParseUint(fields[1], 10, 64)
+		ps.Processes, _ = strconv.ParseUint(filedValue, 10, 64)
 		return
 	}
 
 	if fieldName == "procs_running" {
-		ps.ProcessRunning, _ = strconv.ParseUint(fields[1], 10, 64)
+		ps.ProcessRunning, _ = strconv.ParseUint(filedValue, 10, 64)
 		return
 	}
 
 	if fieldName == "procs_blocked" {
-		ps.ProcessBlocked, _ = strconv.ParseUint(fields[1], 10, 64)
+		ps.ProcessBlocked, _ = strconv.ParseUint(filedValue, 10, 64)
 		return
 	}
 }
@@ -108,7 +110,7 @@ func parseCpuFields(fields []string) *CpuUsage {
 	cu := new(CpuUsage)
 	sz := len(fields)
 	for i := 1; i < sz; i++ {
-		val, err := strconv.ParseUint(fields[i], 10, 64)
+		val, err := strconv.ParseUint(strings.TrimSpace(fields[i]), 10, 64)
 		if err != nil {
 			continue
 		}

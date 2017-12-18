@@ -49,7 +49,7 @@ func GetCpuInfo() (*CpuInfo, error) {
 		itemName := strings.TrimSpace(arr[0])
 		if itemName == "cpu MHz" {
 
-			mHz, err := strconv.ParseFloat(arr[1], 32)
+			mHz, err := strconv.ParseFloat(strings.TrimSpace(arr[1]), 32)
 			if err != nil {
 				errMsg := fmt.Sprintf("unsupport /proc/cpuinfo format: %v", err)
 				log.Error(errMsg)
