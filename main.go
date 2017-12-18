@@ -15,11 +15,11 @@ func main()  {
 	if err != nil{
 		log.Errorf("get cpu info failed: %v", err)
 	}else {
-		cpuStr, err := json.Marshal(cpuInfo)
+		cpuBytes, err := json.Marshal(cpuInfo)
 		if err != nil{
 			log.Errorf("json marshal cpuInfo failed: %v", err)
 		}else{
-			fmt.Println(cpuStr)
+			fmt.Println(string(cpuBytes))
 		}
 	}
 
@@ -29,11 +29,11 @@ func main()  {
 	if err != nil{
 		log.Errorf("get sys info failed: %v", err)
 	}else{
-		sysStr, err := json.Marshal(sysInfo)
+		sysBytes, err := json.Marshal(sysInfo)
 		if err != nil{
 			log.Errorf("json marshal sysInfo failed: %v", err)
 		}else{
-			fmt.Println(sysStr)
+			fmt.Println(string(sysBytes))
 		}
 	}
 
@@ -41,11 +41,11 @@ func main()  {
 	if err != nil{
 		log.Errorf("get fs info failed: %v", err)
 	}else{
-		sysStr, err := json.Marshal(fsInfo)
+		sysBytes, err := json.Marshal(fsInfo)
 		if err != nil{
 			log.Errorf("json marshal fsInfo failed: %v", err)
 		}else{
-			fmt.Println(sysStr)
+			fmt.Println(string(sysBytes))
 		}
 	}
 
@@ -55,14 +55,12 @@ func main()  {
 	if err != nil{
 		log.Errorf("get proc stat failed: %v", err)
 	}else {
-		procStr, err := json.Marshal(procStat)
+		procBytes, err := json.Marshal(procStat)
 		if err != nil{
 			log.Errorf("json marshal procStat failed: %v", err)
 		}else{
-			fmt.Println(procStr)
+			fmt.Println(string(procBytes))
 		}
-
-		fmt.Println(procStr)
 	}
 
 }
