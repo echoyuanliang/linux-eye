@@ -11,14 +11,6 @@ import (
 var log = logging.MustGetLogger("linux-eye")
 var infoMap = map[string]interface{}{}
 
-func processInfo(name string, info interface{}, err error){
-	if err != nil{
-		log.Errorf("get %s failed: %v", name, err)
-	}else {
-		infoMap[name] = info
-	}
-}
-
 var infoProcesses = []string{"sys_info", "cpu_info", "kernel_param", "io_stat", "df_stat", "if_stat", "cpu_stat"}
 func main()  {
 	var wg sync.WaitGroup
@@ -47,7 +39,12 @@ func main()  {
 					info, err = toolkits.CurrentProcStat()
 			}
 
-			processInfo(name, info, err)
+			if err != nil{
+				log.Errorf("get %s failed: %v", name, err)
+			}else {
+				infoMap[name] = info
+			}
+
 			wg.Done()
 		}()
 
