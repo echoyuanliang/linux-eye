@@ -14,27 +14,55 @@ func main()  {
 	cpuInfo, err := toolkits.GetCpuInfo()
 	if err != nil{
 		log.Errorf("get cpu info failed: %v", err)
+	}else {
+		cpuStr, err := json.Marshal(cpuInfo)
+		if err != nil{
+			log.Errorf("json marshal cpuInfo failed: %v", err)
+		}else{
+			fmt.Println(cpuStr)
+		}
 	}
 
-	fmt.Print(json.Marshal(cpuInfo))
 
 	sysInfo, err := toolkits.GetSystemInfo()
 
 	if err != nil{
 		log.Errorf("get sys info failed: %v", err)
+	}else{
+		sysStr, err := json.Marshal(sysInfo)
+		if err != nil{
+			log.Errorf("json marshal sysInfo failed: %v", err)
+		}else{
+			fmt.Println(sysStr)
+		}
 	}
-	fmt.Print(json.Marshal(sysInfo))
 
 	fsInfo, err := toolkits.ListDeviceUsage()
 	if err != nil{
 		log.Errorf("get fs info failed: %v", err)
+	}else{
+		sysStr, err := json.Marshal(fsInfo)
+		if err != nil{
+			log.Errorf("json marshal fsInfo failed: %v", err)
+		}else{
+			fmt.Println(sysStr)
+		}
 	}
-	fmt.Print(json.Marshal(fsInfo))
+
+
 
 	procStat, err := toolkits.CurrentProcStat()
 	if err != nil{
 		log.Errorf("get proc stat failed: %v", err)
+	}else {
+		procStr, err := json.Marshal(procStat)
+		if err != nil{
+			log.Errorf("json marshal procStat failed: %v", err)
+		}else{
+			fmt.Println(procStr)
+		}
+
+		fmt.Println(procStr)
 	}
-	fmt.Print(json.Marshal(procStat))
 
 }
