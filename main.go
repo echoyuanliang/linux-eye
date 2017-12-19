@@ -42,7 +42,7 @@ func NewInfoMap()(*infoMap){
 
 
 var infoProcesses = []string{"sys_info", "cpu_info", "kernel_param", "io_stat", "df_stat",
-"if_stat", "cpu_stat", "net_stat", "mem_info"}
+"if_stat", "cpu_stat", "net_stat", "mem_info", "tcp_link"}
 
 func main()  {
 	var wg sync.WaitGroup
@@ -75,7 +75,8 @@ func main()  {
 					info, err = toolkits.CurrentProcStat()
 				case "net_stat":
 					info, err = toolkits.NetStat()
-
+				case "tcp_link":
+					info, err = toolkits.TcpLinks()
 			}
 
 			if err != nil{
