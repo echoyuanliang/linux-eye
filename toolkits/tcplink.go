@@ -50,7 +50,7 @@ func getIpStr(addr uint64) string{
 	addrBytes[2] = byte((addr >> 16) & 0xFF)
 	addrBytes[3] = byte((addr >> 24) & 0xFF)
 
-	return fmt.Sprintf("%d.%d.%d.%d", addrBytes[3], addrBytes[2], addrBytes[1], addrBytes[0])
+	return fmt.Sprintf("%d.%d.%d.%d", addrBytes[0], addrBytes[1], addrBytes[2], addrBytes[3])
 }
 
 
