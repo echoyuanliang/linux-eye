@@ -40,7 +40,8 @@ func NetStat()(map[string]map[string]uint64, error)  {
 		}
 
 		title := strings.TrimSpace(line[:idx])
-		titleMap := ns[title]
+		titleMap := make(map[string]uint64)
+		ns[title] = titleMap
 		keys := strings.Fields(strings.TrimSpace(line[idx+1:]))
 		valLine, err := reader.ReadString('\n')
 		if err != nil{
