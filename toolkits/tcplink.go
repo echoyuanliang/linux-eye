@@ -25,15 +25,13 @@ type Address struct{
 
 
 type TcpLink struct{
+	User			*User	`json:"user"`
 	LocalAddress		*Address 	`json:"local_address"`
 	RemoteAddress	*Address		`json:"remote_address"`
 
 	Status 		string	`json:"status"`
 	TxQueue		uint64	`json:"tx_queue"`
 	RxQueue		uint64	`json:"rx_queue"`
-	TmWhen		uint64	`json:"tm_when"`
-	TmRetry		uint64	`json:"tm_retry"`
-	User			*User	`json:"user"`
 	Inode		uint64	`json:"inode"`
 }
 
@@ -159,13 +157,6 @@ func GetTcpLinks(tcpFile string)([]*TcpLink, error){
 				return tcpLinks, fmt.Errorf("parse tr/tm-when %s failed: %v", fields[5], err)
 			}
 
-			if link.TmWhen, err = strconv.ParseUint(strings.TrimSpace(tmFields[1]), 16, 64); err != nil{
-				return tcpLinks, fmt.Errorf("parse tm-when %s failed: %v", tmFields[1], err)
-			}
-
-			if link.TmRetry, err = strconv.ParseUint(strings.TrimSpace(fields[6]), 16, 64); err != nil{
-				return tcpLinks, fmt.Errorf("parse retrnsmt %s failed: %v", fields[6], err)
-			}
 
 			if link.User, err = getUserById(fields[7]); err != nil{
 				return tcpLinks, fmt.Errorf("getUserById %s failed: %v", fields[7], err)
