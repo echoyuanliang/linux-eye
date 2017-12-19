@@ -9,7 +9,37 @@ import (
 )
 
 var log = logging.MustGetLogger("linux-eye")
-var infoMap = map[string]interface{}{}
+
+type infoMap struct{
+	BuiltinMap map[string]interface{}
+	Mutex sync.RWMutex
+}
+
+
+func (im *infoMap) Set(key string, val interface{}){
+	im.Mutex.Lock()
+	im.BuiltinMap[key] = val
+	im.Mutex.Unlock()
+}
+
+
+func (im *infoMap) Marshal() (string, error){
+	im.Mutex.RLock()
+	defer im.Mutex.RUnlock()
+
+	infoBytes, err := json.MarshalIndent(im.BuiltinMap, "", "    ")
+	if err != nil{
+		return "", fmt.Errorf("marshal infoMap failed: %v", err)
+	}else {
+		return string(infoBytes), nil
+	}
+}
+
+
+func NewInfoMap()(*infoMap){
+	return &infoMap{BuiltinMap:make(map[string]interface{})}
+}
+
 
 var infoProcesses = []string{"sys_info", "cpu_info", "kernel_param", "io_stat", "df_stat",
 "if_stat", "cpu_stat", "net_stat", "mem_info"}
@@ -17,6 +47,8 @@ var infoProcesses = []string{"sys_info", "cpu_info", "kernel_param", "io_stat", 
 func main()  {
 	var wg sync.WaitGroup
 	wg.Add(len(infoProcesses))
+
+	im := NewInfoMap()
 
 	for _, name := range infoProcesses{
 		go func(name string) {
@@ -29,6 +61,8 @@ func main()  {
 					info, err = toolkits.GetSystemInfo()
 				case "cpu_info":
 					info, err = toolkits.GetCpuInfo()
+				case "mem_info":
+					info, err = toolkits.MemInfo()
 				case "kernel_param":
 					info, err = toolkits.KernelParam()
 				case "io_stat":
@@ -39,8 +73,6 @@ func main()  {
 					info, err = toolkits.NetIfs()
 				case "cpu_stat":
 					info, err = toolkits.CurrentProcStat()
-				case "mem_info":
-					info, err = toolkits.MemInfo()
 				case "net_stat":
 					info, err = toolkits.NetStat()
 
@@ -49,7 +81,7 @@ func main()  {
 			if err != nil{
 				log.Errorf("get %s failed: %v", name, err)
 			}else {
-				infoMap[name] = info
+				im.Set(name, info)
 			}
 
 			wg.Done()
@@ -58,10 +90,10 @@ func main()  {
 	}
 
 	wg.Wait()
-	infoBytes, err := json.MarshalIndent(infoMap, "", "    ")
+	infoStr, err := im.Marshal()
 	if err != nil{
 		log.Fatalf("marshal infoMap failed: %v", err)
 	}else {
-		fmt.Println(string(infoBytes))
+		fmt.Println(infoStr)
 	}
 }
